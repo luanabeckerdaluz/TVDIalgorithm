@@ -44,11 +44,13 @@ The methodology used in this work was the same used in the paper written by Luci
 
 ## Example
 
-An example for calculating TVDI in GEE is shown below. Once the user has his region of interest (ROI) and the NDVI and LST images, the only two steps to invoke the calculation is to import the TVDI module and invoke the **computeTVDI** function.
+The TVDI processing can be executed by using two main functions. One of them is used to generate the TVDI based on only one NDVI and one LST image (singleTVDI), and the other function is used to generate the TVDI for several NDVI and several LST images (collectionTVDI). 
+
+### singleTVDI
 
 ``` r
-// Define the Region of Interest
-var ROI = ee.FeatureCollection(...)
+// Obtain the Region of Interest
+var ROI = ee.Geometry(...)
 
 // Obtain the NDVI image to be processed
 var imageNDVI = ee.Image(...)
@@ -56,43 +58,44 @@ var imageNDVI = ee.Image(...)
 // Obtain the LST image to be processed
 var imageLST = ee.Image(...)
 
-// Define the spatial scale to resample NDVi and LST images
+// Define the spatial resolution to downscale/upscale NDVI and LST images
 var SCALE_M_PX = 250
 
-// Define the DEBUG flag - If the function will print the results during processing
+// Define the DEBUG flag: If true, the function will print the results during processing
 var DEBUG_FLAG = false
 
 // Import TVDI processing module
-var TVDImodule = require('AAAAAAALLLLLLTERARAAAAAAAAAAAAAAAAAAAAAAAusers/leobeckerdaluz/TVDI_algorithm_dev:compute_TVDI');
+var computeTVDI = require('users/leobeckerdaluz/TVDI_algorithm:computeTVDI')
 
 // Compute TVDI
-var imageTVDI = TVDImodule.computeTVDIAAAAAALLLLLLLLLLTERRRR(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG)
+var imageTVDI = computeTVDI.singleTVDI(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG)
 
 // Add TVDI as a layer
 Map.addLayer(imageTVDI, {}, 'TVDI'}
 ```
 
 
-## Citation
-
-Think **TVDI algorithm** is useful? Let others discover it by telling them.
-
-Using **TVDI algorithm** for a paper you are writing? Consider citing it
+### collectionTVDI
 
 ``` r
-citation("TVDI algorithm")
-To cite TVDI algorithm in publications use:
-  
-  xxxxxxxxxxxxxxC Aybar, Q Wu, L Bautista, R Yali and A Barja (2020) rgee: An R
-  package for interacting with Google Earth Engine Journal of Open
-  Source Software URL https://github.com/r-spatial/rgee/.
+// Obtain the Region of Interest
+var ROI = ee.Geometry(...)
 
-A BibTeX entry for LaTeX users is
+// Obtain the NDVI image collection to be processed
+var imageCollectionNDVI = ee.ImageCollection(...)
 
-@Article{,
-  title = {rgeexxxxxxxxxxxxxx: An R package for interacting with Google Earth Engine},
-  author = {Cexxxxxxxxxxxxxxsar Aybar and Quisheng Wu and Lesly Bautista and Roy Yali and Antony Barja},
-  journal = {Joxxxxxxxxxxxxurnal of Open Source Software},
-  year = {2020},
-}
+// Obtain the LST image collection to be processed
+var imageCollectionLST = ee.ImageCollection(...)
+
+// Define the spatial resolution to downscale/upscale NDVI and LST images
+var SCALE_M_PX = 250
+
+// Import TVDI processing module
+var computeTVDI = require('users/leobeckerdaluz/TVDI_algorithm:computeTVDI')
+
+// Compute TVDI
+var imageCollectionTVDI = computeTVDI.collectionTVDI(imageCollectionNDVI, imageCollectionLST, ROI, SCALE_M_PX)
+
+// Add TVDI first processed image as a layer
+Map.addLayer(imageCollectionTVDI.first(), {}, 'TVDI'}
 ```
