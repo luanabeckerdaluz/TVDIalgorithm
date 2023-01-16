@@ -22,57 +22,73 @@
 
 
  
-// ===================================================================
+// ============================================================================================
 // Region of Interest (ROI)
-var ROI = RSgeom
-
+var ROI_FC = ee.FeatureCollection("users/leobeckerdaluz/FIXED_shapes/mesoregionRS")
+var ROI = ROI_FC.geometry()
 Map.addLayer(ROI, {}, 'ROI')
 Map.centerObject(ROI)
 
 
-// ===================================================================
+
+// ============================================================================================
 // Set scale (m/px) to upscale/downscale NDVI and LST images
 var SCALE_M_PX = 1000
-// var SCALE_M_PX = 250
 
 
-// ===================================================================
-// All desired dates
-var dates = ['2018_01_01','2018_01_17','2018_02_02','2018_02_18']
+
+// ============================================================================================
+// Required dates
+var dates = ee.List(['2018-01-01','2018-01-17','2018-02-02','2018-02-18'])
+var startDate = ee.Date(dates.get(0))
+var endDate = ee.Date(dates.get(-1)).advance(1,"day")
 
 
-// ===================================================================
+
+// ============================================================================================
+// Visualization palette
+var pal = ['lightgreen','darkgreen','yellow','orange','red','darkred']
+
+
+
+// ============================================================================================
 // NDVI collection
-var imageCollectionNDVI = ee.ImageCollection('MODIS/061/MOD13Q1')
+var collectionNDVI = ee.ImageCollection('MODIS/061/MOD13Q1')
   .filterBounds(ROI)
-  .filter(ee.Filter.inList('system:index', dates))
+  .filterDate(startDate, endDate)
   .select('NDVI')
-  .map(function(image){
-    return image
-      .clip(ROI)
-      .rename('NDVI')                             // Rename band
-      .multiply(0.0001)                           // Apply band scale
-      .reproject('EPSG:4326', null, SCALE_M_PX)   // Downscale/Upscale image
+  .map(function(img){
+    return img
+      .rename('NDVI')                               // Rename band
+      .multiply(0.0001)                             // Apply band scale
+      .reproject('EPSG:4326', null, SCALE_M_PX)     // Downscale/Upscale image
+      .clip(ROI)                                    // Clip to geometry
+      .set("date", img.date().format("yyyy-MM-dd")) // Set date property
   })
+  .filter(ee.Filter.inList('date', dates))
 
-Map.addLayer(imageCollectionNDVI.first(), {min:0.2,max:1.0,palette:['red','white','darkgreen']}, 'imageCollectionNDVI first')
+Map.addLayer(collectionNDVI.first(), {min:0.2,max:1.0,palette:pal}, 'IN - collectionNDVI img1')
 
 
-// ===================================================================
+
+// ============================================================================================
 // LST collection
-var imageCollectionLST = ee.ImageCollection('MODIS/061/MOD11A2')
+var collectionLST = ee.ImageCollection('MODIS/061/MOD11A2')
   .filterBounds(ROI)
-  .filter(ee.Filter.inList('system:index', dates))
+  .filterDate(startDate, endDate)
   .select('LST_Day_1km')
-  .map(function(image){
-    return image
-      .clip(ROI)
-      .rename('LST')                              // Rename band
-      .multiply(0.02)                             // Apply band scale
-      .reproject('EPSG:4326', null, SCALE_M_PX)   // Downscale/Upscale image
+  .map(function(img){
+    return img
+      .rename('LST')                                // Rename band
+      .multiply(0.02)                               // Apply band scale
+      .reproject('EPSG:4326', null, SCALE_M_PX)     // Downscale/Upscale image
+      .clip(ROI)                                    // Clip to geometry
+      .set("date", img.date().format("yyyy-MM-dd")) // Set date property
   })
+  .filter(ee.Filter.inList('date', dates))
 
-Map.addLayer(imageCollectionLST.first(), {min:294, max:308, palette:['lightgreen','darkgreen','yellow','orange','red','darkred']}, 'imageCollectionLST first')
+Map.addLayer(collectionLST.first(), {min:294, max:308, palette:pal}, 'IN - collectionLST img1')
+
 
 
 print("================== INPUTS ===================",
@@ -81,37 +97,41 @@ print("================== INPUTS ===================",
       "- Scale (m/px):",
       SCALE_M_PX,
       "- Image Collection NDVI: ", 
-      imageCollectionNDVI,
+      collectionNDVI,
       "- Image Collection LST: ", 
-      imageCollectionLST)
+      collectionLST)
 
 
 
-// ===================================================================
+// ============================================================================================
 // Compute TVDI
-// ===================================================================
+// ============================================================================================
 
 var computeTVDI = require('users/leobeckerdaluz/TVDI_algorithm:computeTVDI')
 
-var TVDIvisParams = {min:-0.2, max:1, palette:['lightgreen','darkgreen','yellow','orange','red','darkred']}
+var TVDIvisParams = {min:-0.2, max:1, palette:pal}
 
 
-print("========== collection TVDI example ==========")
 
-var imageCollectionTVDI = computeTVDI.collectionTVDI(imageCollectionNDVI, imageCollectionLST, ROI, SCALE_M_PX, true)
+print("========== collectionTVDI example ==========")
 
-print(imageCollectionTVDI)
-var img1 = ee.Image(imageCollectionTVDI.toList(imageCollectionTVDI.size()).get(0))
-var img2 = ee.Image(imageCollectionTVDI.toList(imageCollectionTVDI.size()).get(1))
-Map.addLayer(img1, TVDIvisParams, 'imageCollectionTVDI img1')
-Map.addLayer(img2, TVDIvisParams, 'imageCollectionTVDI img2')
-print('The first two calculated TVDI images were added to the map!')
+// Compute collection TVDI
+var collectionTVDI = computeTVDI.collectionTVDI(collectionNDVI, collectionLST, ROI, SCALE_M_PX)
+
+// Print and add the first two computed images to the map
+var img1 = ee.Image(collectionTVDI.toList(collectionTVDI.size()).get(0))
+var img2 = ee.Image(collectionTVDI.toList(collectionTVDI.size()).get(1))
+Map.addLayer(img1, TVDIvisParams, 'OUT - collectionTVDI img1')
+Map.addLayer(img2, TVDIvisParams, 'OUT - collectionTVDI img2')
+print(collectionTVDI,
+      'The first two calculated TVDI images have been added to the map!')
 
 
-print("============ image TVDI example =============")
 
-var NDVI = imageCollectionNDVI.first()
-var LST = imageCollectionLST.first()
+print("=========== singleTVDI example =============")
+
+var NDVI = collectionNDVI.first()
+var LST = collectionLST.first()
 
 // Computes the number of pixels in both images
 var reduceRegionParameters = {
@@ -125,14 +145,14 @@ print('Note that both images have different numbers of pixels:',
       'LST Pixels count:',  
       ee.Number(LST.reduceRegion(reduceRegionParameters).get("LST")))
 
-/* 
-Compute singleTVDI. Note that when true, the flag DEBUG_FLAG displays the 
-results of variables calculated in TVDI 
-*/
+// When true, the flag DEBUG_FLAG displays the results of variables calculated in TVDI 
 var DEBUG_FLAG = true 
+
+// Compute singleTVDI
 var imageTVDI = computeTVDI.singleTVDI(NDVI, LST, ROI, SCALE_M_PX, true)
 
-Map.addLayer(imageTVDI, TVDIvisParams, "imageTVDI")
+// Print and add TVDI single image to the map
+Map.addLayer(imageTVDI, TVDIvisParams, "OUT - imageTVDI")
 print("imageTVDI:", 
       imageTVDI,
       imageTVDI.getDownloadURL({name:"TVDI", region:ROI}))
