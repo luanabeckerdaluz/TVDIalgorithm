@@ -1,13 +1,9 @@
 /**
-* Copyright (c) Leonardo Becker da Luz and Grazieli Rodigheri 2023
+* Copyright (c) Leonardo Becker da Luz 2023
 * 
 * Leonardo Becker da Luz
 * leobeckerdaluz@gmail.com
 * National Institute for Space Research (INPE)
-* 
-* Grazieli Rodigheri
-* grazielirodigheri@gmail.com
-* Federal University of Rio Grande do Sul (UFRGS)
 * 
 * This source code is licensed under the MIT license found in the LICENSE file 
 * in the root directory of this source tree.
@@ -24,7 +20,7 @@
  
 // ============================================================================================
 // Region of Interest (ROI)
-var ROI_FC = ee.FeatureCollection("users/leobeckerdaluz/FIXED_shapes/mesoregionRS")
+var ROI_FC = ee.FeatureCollection("users/leobeckerdaluz/Artigo2_NPP/shapefiles/shpMesoregionRS")
 var ROI = ROI_FC.geometry()
 Map.addLayer(ROI, {}, 'ROI')
 Map.centerObject(ROI)
@@ -39,7 +35,12 @@ var SCALE_M_PX = 1000
 
 // ============================================================================================
 // Required dates
-var dates = ee.List(['2018-01-01','2018-01-17','2018-02-02','2018-02-18'])
+var dates = ee.List([
+  '2018-01-01',
+  '2018-01-17',
+  '2018-02-02',
+  '2018-02-18'
+])
 var startDate = ee.Date(dates.get(0))
 var endDate = ee.Date(dates.get(-1)).advance(1,"day")
 
@@ -105,7 +106,6 @@ print("================== INPUTS ===================",
 
 // ============================================================================================
 // Compute TVDI
-// ============================================================================================
 
 var computeTVDI = require('users/leobeckerdaluz/TVDI_algorithm:computeTVDI')
 

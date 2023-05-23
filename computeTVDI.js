@@ -1,13 +1,13 @@
 /**
-* Copyright (c) Leonardo Becker da Luz and Grazieli Rodigheri 2023
+* Copyright (c) Leonardo Becker da Luz and Juliano Schirmbeck 2023
 * 
 * Leonardo Becker da Luz
 * leobeckerdaluz@gmail.com
 * National Institute for Space Research (INPE)
 * 
-* Grazieli Rodigheri
-* grazielirodigheri@gmail.com
-* Federal University of Rio Grande do Sul (UFRGS)
+* Juliano Schirmbeck
+* schirmbeck.j@gmail.com
+* University of Vale do Taquari (UNIVATES)
 * 
 * This source code is licensed under the MIT license found in the LICENSE file 
 * in the root directory of this source tree.
@@ -33,20 +33,19 @@
 * 
 * Handle input values. Some values must not be null.
 * 
-* @param  {ImageCollection or Image} NDVI: NDVI input
-* @param  {ImageCollection or Image} LST: LST input
-* @param  {Geometry} ROIgeometry: Region of Interest
-* @param  {Number} SCALE_M_PX: Spatial Resolution of input images
-* @param  {boolean} DEBUG_FLAG: User defines if wants to debug results
-* @param  {boolean} collection: internal flag (if processing is for collection or image)
+* @param  {Object} NDVI: NDVI input
+* @param  {Object} LST: LST input
+* @param  {Object} ROIgeometry: Region of Interest
+* @param  {Object} SCALE_M_PX: Spatial Resolution of input images
+* @param  {boolean} isCollection: internal flag (if processing is for collection or image)
 * @return {string or boolean} Returns the error string or returns false (no error)
 */
-var handleInputs = function(NDVI, LST, ROI, SCALE_M_PX, DEBUG_FLAG, collection){
+var handleInputs = function(NDVI, LST, ROI, SCALE_M_PX, isCollection){
   var error = ""
   
   // input NDVI Image or ImageCollection must not be null
   if (NDVI === null){
-    if (collection){
+    if (isCollection){
       error += "ERROR: imageCollectionNDVI must not be null!\n"
     }
     else{
@@ -56,7 +55,7 @@ var handleInputs = function(NDVI, LST, ROI, SCALE_M_PX, DEBUG_FLAG, collection){
 
   // input LST Image or ImageCollection must not be null
   if (LST === null){
-    if (collection){
+    if (isCollection){
       error += "ERROR: imageCollectionLST must not be null!\n"
     }
     else{
@@ -75,7 +74,7 @@ var handleInputs = function(NDVI, LST, ROI, SCALE_M_PX, DEBUG_FLAG, collection){
   }
   
   // The collections must have the same size
-  if (collection && NDVI !== null && LST !== null){
+  if (isCollection && NDVI !== null && LST !== null){
     var sizeIsDifferent = ee.Algorithms.If((NDVI.size()).neq(LST.size()), true, false)
     if (sizeIsDifferent.getInfo()){
       error = "ERROR: NDVI and LST collections don't have the same size!"
@@ -109,7 +108,7 @@ var handleInputs = function(NDVI, LST, ROI, SCALE_M_PX, DEBUG_FLAG, collection){
 var singleTVDI = function(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG){
   
   // Handle inputs
-  var error = handleInputs(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG, false)
+  var error = handleInputs(imageNDVI, imageLST, ROI, SCALE_M_PX, false)
   if (error){
     print(error)
     return error
@@ -125,7 +124,7 @@ var singleTVDI = function(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG){
   
   /**
   * Get the LST pixels for each 0.01 NDVI interval.
-  * Note that some NDVI interval may not contain any pixels. In
+  * Note that some NDVI intervals may not contain any pixels. In
   * these cases, the map function will return null and the value
   * is deleted from map by using the dropNulls parameter.
   */ 
@@ -159,7 +158,7 @@ var singleTVDI = function(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG){
        * If there is more than 1 distinct LST pixel, return the mask. Otherwise, 
        * return null, because it will not be possible to compute the histogram in 
        * the next step. When returning null, the dropNulls parameter of the map
-       * function will ignore these nulls values. 
+       * function will ignore these null values. 
        */
       return ee.Algorithms.If(countDistinctNumber.gt(1), LSTOnInterval, null)
     },
@@ -298,7 +297,7 @@ var singleTVDI = function(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG){
     .clamp(0,1)
   
   
-  // If the user set true on this functino parameter, print debug results
+  // If the user set true on this function parameter, print debug results
   if(DEBUG_FLAG){
     print(
       "=========== TVDI ===========",
@@ -334,7 +333,7 @@ var singleTVDI = function(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG){
 var collectionTVDI = function(imageCollectionNDVI, imageCollectionLST, ROI, SCALE_M_PX){
   
   // Handle inputs
-  var error = handleInputs(imageCollectionNDVI, imageCollectionLST, ROI, SCALE_M_PX, false, true)
+  var error = handleInputs(imageCollectionNDVI, imageCollectionLST, ROI, SCALE_M_PX, true)
   if (error){
     print(error)
     return error
