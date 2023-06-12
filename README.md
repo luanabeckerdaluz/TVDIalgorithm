@@ -17,7 +17,6 @@ developed."></a>
 <p align="center">  
   • <a href="#methodology">Methodology</a> &nbsp;
   • <a href="#example">Example</a> &nbsp;
-  • <a href="#citation">Citation</a> &nbsp;
 </p>
 
 
@@ -49,53 +48,49 @@ The TVDI processing can be executed by using two main functions. One of them is 
 ### singleTVDI
 
 ``` r
-// Obtain the Region of Interest
-var ROI = ee.Geometry(...)
+var ROI = ee.Geometry(...)      // Region of Interest
 
-// Obtain the NDVI image to be processed
-var imageNDVI = ee.Image(...)
+var imageNDVI = ee.Image(...)   // NDVI Image
 
-// Obtain the LST image to be processed
-var imageLST = ee.Image(...)
+var imageLST = ee.Image(...)    // LST Image
 
-// Define the spatial resolution to downscale/upscale NDVI and LST images
-var SCALE_M_PX = 250
+var SCALE_M_PX = CONST          // Spatial Resolution (e.g. 250)
 
-// Define the DEBUG flag: If true, the function will print the results during processing
-var DEBUG_FLAG = false
+var DEBUG_FLAG = false          // If you want that function prints results
 
 // Import TVDI processing module
 var computeTVDI = require('users/leobeckerdaluz/TVDI_algorithm:computeTVDI')
 
 // Compute TVDI
-var imageTVDI = computeTVDI.singleTVDI(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG)
-
-// Add TVDI as a layer
-Map.addLayer(imageTVDI, {}, 'TVDI'}
+var imageTVDI = computeTVDI.singleTVDI(
+  imageNDVI, 
+  imageLST, 
+  ROI, 
+  SCALE_M_PX, 
+  DEBUG_FLAG
+)
 ```
 
 
 ### collectionTVDI
 
 ``` r
-// Obtain the Region of Interest
-var ROI = ee.Geometry(...)
+var ROI = ee.Geometry(...)                        // Region of Interest
 
-// Obtain the NDVI image collection to be processed
-var imageCollectionNDVI = ee.ImageCollection(...)
+var imageCollectionNDVI = ee.ImageCollection(...) // NDVI image collection
 
-// Obtain the LST image collection to be processed
-var imageCollectionLST = ee.ImageCollection(...)
+var imageCollectionLST = ee.ImageCollection(...)  // LST image collection
 
-// Define the spatial resolution to downscale/upscale NDVI and LST images
-var SCALE_M_PX = 250
+var SCALE_M_PX = CONST                            // Spatial Resolution (e.g. 250)
 
 // Import TVDI processing module
 var computeTVDI = require('users/leobeckerdaluz/TVDI_algorithm:computeTVDI')
 
 // Compute TVDI
-var imageCollectionTVDI = computeTVDI.collectionTVDI(imageCollectionNDVI, imageCollectionLST, ROI, SCALE_M_PX)
-
-// Add TVDI first processed image as a layer
-Map.addLayer(imageCollectionTVDI.first(), {}, 'TVDI'}
+var imageCollectionTVDI = computeTVDI.collectionTVDI(
+  imageCollectionNDVI, 
+  imageCollectionLST, 
+  ROI, 
+  SCALE_M_PX
+)
 ```
