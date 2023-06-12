@@ -37,7 +37,7 @@
 * @param  {Object} LST: LST input
 * @param  {Object} ROIgeometry: Region of Interest
 * @param  {Object} SCALE_M_PX: Spatial Resolution of input images
-* @param  {boolean} isCollection: internal flag (if processing is for collection or image)
+* @param  {boolean} isCollection: internal flag
 * @return {string or boolean} Returns the error string or returns false (no error)
 */
 var handleInputs = function(NDVI, LST, ROI, SCALE_M_PX, isCollection){
@@ -119,8 +119,12 @@ var singleTVDI = function(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG){
   }
   
   // Reproject NDVI and LST images
-  imageNDVI = ee.Image(imageNDVI).reproject('EPSG:4326', null, SCALE_M_PX).rename("NDVI")
-  imageLST = ee.Image(imageLST).reproject('EPSG:4326', null, SCALE_M_PX).rename("LST")
+  imageNDVI = ee.Image(imageNDVI)
+    .reproject('EPSG:4326', null, SCALE_M_PX)
+    .rename("NDVI")
+  imageLST = ee.Image(imageLST)
+    .reproject('EPSG:4326', null, SCALE_M_PX)
+    .rename("LST")
   
   /**
   * Get the LST pixels for each 0.01 NDVI interval.
@@ -140,7 +144,9 @@ var singleTVDI = function(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG){
       // Creates a mask with only pixels whose values are within the NDVI interval.
       var valuesGreaterThanMinNDVI = imageNDVI.gt(minNDVI)
       var valuesLessThanMaxNDVI = imageNDVI.lt(maxNDVI)
-      var maskIntervalNDVI = valuesGreaterThanMinNDVI.and(valuesLessThanMaxNDVI).selfMask()
+      var maskIntervalNDVI = valuesGreaterThanMinNDVI
+        .and(valuesLessThanMaxNDVI)
+        .selfMask()
       
       // Get LST values for the current NDVI interval
       var LSTOnInterval = imageLST.updateMask(maskIntervalNDVI).rename('LST')
@@ -192,7 +198,9 @@ var singleTVDI = function(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG){
     
     // Get frequency values, accumulate and normalize them.
     var accumulatedHistogramLSTs = histogramDict.toArray().accum(0)
-    var accumulatedHistogramLSTsNormalized = accumulatedHistogramLSTs.divide( accumulatedHistogramLSTs.get([-1]) )
+    var lastAccumulatedHistogramLSTs = accumulatedHistogramLSTs.get([-1])
+    var accumulatedHistogramLSTsNormalized = accumulatedHistogramLSTs
+      .divide(lastAccumulatedHistogramLSTs)
     
     // Get temperatures from histogram
     var histogramLSTs = histogramDict.keys()
@@ -300,7 +308,7 @@ var singleTVDI = function(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG){
   // If the user set true on this function parameter, print debug results
   if(DEBUG_FLAG){
     print(
-      "=========== TVDI ===========",
+      "======== TVDI DEBUG ========",
       'LSTValuesOnNDVIIntervals:', LSTValuesOnNDVIIntervals,
       'Wet and Dry edges pixels:', edgesPixelsMasks,
       'Dry Edge a_offset:', dryEdgeOffset_a, 
@@ -330,7 +338,11 @@ var singleTVDI = function(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG){
 * @param  {boolean} DEBUG_FLAG: User defines if wants to debug results
 * @return {ImageCollection} ImageCollectionTVDI: TVDI collection processed
 */
-var collectionTVDI = function(imageCollectionNDVI, imageCollectionLST, ROI, SCALE_M_PX){
+var collectionTVDI = function(
+  imageCollectionNDVI, 
+  imageCollectionLST, 
+  ROI, 
+  SCALE_M_PX){
   
   // Handle inputs
   var error = handleInputs(imageCollectionNDVI, imageCollectionLST, ROI, SCALE_M_PX, true)
