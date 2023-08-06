@@ -16,6 +16,7 @@ developed."></a>
 
 <p align="center">  
   • <a href="#methodology">Methodology</a> &nbsp;
+  • <a href="#google-earth-engine-code-availability">GEE Code Availability</a> &nbsp;
   • <a href="#example">Example</a> &nbsp;
 </p>
 
@@ -25,7 +26,7 @@ developed."></a>
 </h1>
 
 
-[Google Earth Engine](https://earthengine.google.com/) is a cloud-based platform that allows users to have an easy access to a petabyte-scale archive of remote sensing data and run geospatial analysis on Google's infrastructure. The present work developed a function in Google Earth Engine to calculate the TVDI index based on the paper [L. W. Schirmbeck et al., 2018](https://doi.org/10.1590/1678-992X-2016-0315).
+[Google Earth Engine (GEE)](https://earthengine.google.com/) is a cloud-based platform that allows users to have an easy access to a petabyte-scale archive of remote sensing data and run geospatial analysis on Google's infrastructure. The present work developed a function in Google Earth Engine to calculate the TVDI index based on the paper [L. W. Schirmbeck et al., 2018](https://doi.org/10.1590/1678-992X-2016-0315).
 
 
 
@@ -41,11 +42,19 @@ The methodology used in this work was the same used in the paper written by Luci
 
 
 
+## Google Earth Engine Code Availability
+
+The source code is available in this GitHub repository as well as in the GEE repository, where you can run the example code directly in the interface. To access the repository, use the following link:
+
+https://code.earthengine.google.com/?accept_repo=users/leobeckerdaluz/TVDI_algorithm
+
+
+
 ## Example
 
 The TVDI processing can be executed by using two main functions. One of them is used to generate the TVDI based on only one NDVI and one LST image (singleTVDI), and the other function is used to generate the TVDI for several NDVI and several LST images (collectionTVDI). 
 
-### singleTVDI
+#### singleTVDI
 
 ``` r
 var ROI = ee.Geometry(...)      // Region of Interest
@@ -72,7 +81,7 @@ var imageTVDI = computeTVDI.singleTVDI(
 ```
 
 
-### collectionTVDI
+#### collectionTVDI
 
 ``` r
 var ROI = ee.Geometry(...)                        // Region of Interest
