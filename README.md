@@ -2,7 +2,7 @@
   TVDI algorithm
 </h2>
 
-<h4 align="center">Google Earth Engine function to compute the Temperature-Vegetation Dryness Index (TVDI).</h4>
+<h4 align="center">Google Earth Engine function to compute Temperature-Vegetation Dryness Index (TVDI)</h4>
 
 <p align="center">
 <a href="https://www.repostatus.org/#active"><img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable
@@ -22,7 +22,7 @@ developed."></a>
 
 
 <h1 align="center">
-  <a><img src="https://user-images.githubusercontent.com/27021459/175127149-02e4bec3-8ef1-4587-91d1-97b8faa7a668.png" alt="Markdownify" width="600"></a>
+  <a><img src="https://private-user-images.githubusercontent.com/27021459/301724763-71304fc0-bc8f-43a8-835b-539851a81a6a.png?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MDY4NDcwMTAsIm5iZiI6MTcwNjg0NjcxMCwicGF0aCI6Ii8yNzAyMTQ1OS8zMDE3MjQ3NjMtNzEzMDRmYzAtYmM4Zi00M2E4LTgzNWItNTM5ODUxYTgxYTZhLnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNDAyMDIlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjQwMjAyVDA0MDUxMFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPWUwNmU5ZTYzNWM5NzA2NWVhOTdmYzQxZjJiNTUwY2FiZmZhNDUwMTU5MjJkM2YyYzI0OTFkYTMyMWFjNmQyYzMmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JmFjdG9yX2lkPTAma2V5X2lkPTAmcmVwb19pZD0wIn0.DwvuR-tF-nkoCoDyzerwnTvVXBb5UKS2mO8r6oM71Ls" alt="Markdownify" width="600"></a>
 </h1>
 
 
@@ -46,7 +46,7 @@ The methodology used in this work was the same used in the paper written by Luci
 
 The source code is available in this GitHub repository as well as in the GEE repository, where you can run the example code directly in the interface. To access the repository, use the following link:
 
-https://code.earthengine.google.com/?accept_repo=users/leobeckerdaluz/TVDI_algorithm
+https://code.earthengine.google.com/?accept_repo=users/luanabeckerdaluz/TVDIalgorithm
 
 
 
@@ -57,18 +57,14 @@ The TVDI processing can be executed by using two main functions. One of them is 
 #### singleTVDI
 
 ``` r
-var ROI = ee.Geometry(...)      // Region of Interest
-
-var imageNDVI = ee.Image(...)   // NDVI Image
-
-var imageLST = ee.Image(...)    // LST Image
-
-var SCALE_M_PX = CONST          // Spatial Resolution (e.g. 250)
-
-var DEBUG_FLAG = false          // If you want that function prints results
+var ROI = ee.Geometry(...)
+var imageNDVI = ee.Image(...)
+var imageLST = ee.Image(...)
+var SCALE_M_PX = CONST
+var DEBUG_FLAG = false
 
 // Import TVDI processing module
-var computeTVDI = require('users/leobeckerdaluz/TVDI_algorithm:computeTVDI')
+var computeTVDI = require('users/luanabeckerdaluz/TVDIalgorithm:computeTVDI')
 
 // Compute TVDI
 var imageTVDI = computeTVDI.singleTVDI(
@@ -84,16 +80,13 @@ var imageTVDI = computeTVDI.singleTVDI(
 #### collectionTVDI
 
 ``` r
-var ROI = ee.Geometry(...)                        // Region of Interest
-
-var imageCollectionNDVI = ee.ImageCollection(...) // NDVI image collection
-
-var imageCollectionLST = ee.ImageCollection(...)  // LST image collection
-
-var SCALE_M_PX = CONST                            // Spatial Resolution (e.g. 250)
+var ROI = ee.Geometry(...)
+var imageCollectionNDVI = ee.ImageCollection(...)
+var imageCollectionLST = ee.ImageCollection(...)
+var SCALE_M_PX = CONST
 
 // Import TVDI processing module
-var computeTVDI = require('users/leobeckerdaluz/TVDI_algorithm:computeTVDI')
+var computeTVDI = require('users/luanabeckerdaluz/TVDIalgorithm:computeTVDI')
 
 // Compute TVDI
 var imageCollectionTVDI = computeTVDI.collectionTVDI(
