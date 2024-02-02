@@ -1,9 +1,13 @@
 /**
-* Copyright (c) Leonardo Becker da Luz 2023
+* Copyright (c) Luana Becker da Luz 2023
 * 
-* Leonardo Becker da Luz
-* leobeckerdaluz@gmail.com
+* Luana Becker da Luz
+* luanabeckerdaluz@gmail.com
 * National Institute for Space Research (INPE)
+* 
+* Grazieli Rodigheri
+* grazielirodigheri@gmail.com
+* Federal University of Rio Grande do Sul (UFRGS)
 * 
 * This source code is licensed under the MIT license found in the LICENSE file 
 * in the root directory of this source tree.
@@ -20,8 +24,7 @@
  
 // ==============================================================================
 // Region of Interest (ROI)
-var ROIasset = "users/leobeckerdaluz/Artigo2_NPP/shapefiles/shpMesoregionRS"
-var ROI_FC = ee.FeatureCollection(ROIasset)
+var ROI_FC = ee.FeatureCollection("projects/ee-luanabeckerdaluz/assets/paper2NPP/shapefiles/shpMesoregionRS")
 var ROI = ROI_FC.geometry()
 Map.addLayer(ROI, {}, 'ROI')
 Map.centerObject(ROI)
@@ -111,7 +114,7 @@ print("================== INPUTS ===================",
 // ==============================================================================
 // Compute TVDI
 
-var computeTVDI = require('users/leobeckerdaluz/TVDI_algorithm:computeTVDI')
+var computeTVDI = require('users/luanabeckerdaluz/TVDIalgorithm:computeTVDI')
 
 
 
@@ -171,4 +174,3 @@ Map.addLayer(imageTVDI, TVDIvisParams, "OUT - imageTVDI")
 print("imageTVDI:", 
       imageTVDI,
       imageTVDI.getDownloadURL({name:"TVDI", region:ROI}))
-
