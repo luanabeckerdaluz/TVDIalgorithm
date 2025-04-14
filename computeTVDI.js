@@ -1,5 +1,5 @@
 /**
-* Copyright (c) Luana Becker da Luz and Juliano Schirmbeck 2023
+* Copyright (c) Luana Becker da Luz and Juliano Schirmbeck 2025
 * 
 * Luana Becker da Luz
 * luanabeckerdaluz@gmail.com
@@ -318,11 +318,9 @@ var singleTVDI = function(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG){
     )
   }
   
-  
   // Return TVDI image
   return imageTVDI
 }
-
 
 
 
@@ -335,21 +333,25 @@ var singleTVDI = function(imageNDVI, imageLST, ROI, SCALE_M_PX, DEBUG_FLAG){
 * @param  {ImageCollection} imageCollectionLST: LST collection to be processed
 * @param  {FeatureCollection} ROI: Region of Interest
 * @param  {Number} SCALE_M_PX: Spatial Resolution of input images
-* @param  {boolean} DEBUG_FLAG: User defines if wants to debug results
+* @param  {boolean} copyDate: If defined, copy date property from NDVI image
 * @return {ImageCollection} ImageCollectionTVDI: TVDI collection processed
 */
 var collectionTVDI = function(
   imageCollectionNDVI, 
   imageCollectionLST, 
   ROI, 
-  SCALE_M_PX){
-  
+  SCALE_M_PX,
+  copyDate){
+
   // Handle inputs
   var error = handleInputs(imageCollectionNDVI, imageCollectionLST, ROI, SCALE_M_PX, true)
   if (error){
     print(error)
     return error
   }
+  
+  // If copyDate is defined, set to true
+  copyDate = (copyDate === undefined) ? false : true;
   
   /** Obtain ImageCollections sizes. They all have the same size because 
    * this has been checked previously. 
@@ -372,8 +374,14 @@ var collectionTVDI = function(
      * to false because it is not possible to print within the map function. 
      */
     var TVDI = singleTVDI(NDVI, LST, ROI, SCALE_M_PX, false)
+      .set('system:index', ee.String(i));
     
-    return TVDI.set("system:index", ee.String(i));
+    // If copyDate is defined, copy date property from NDVI image
+    return ee.Image(ee.Algorithms.If(
+      copyDate,
+      TVDI.set('date', NDVI.get('date')),
+      TVDI
+    ));
   })
   
   // Since a list has been iterated through, now cast to an ImageCollection
@@ -384,7 +392,7 @@ var collectionTVDI = function(
 }
 
 
-
 // Exports the singleTVDI and collectionTVDI functions to be accessed from other codes
 exports.singleTVDI = singleTVDI
 exports.collectionTVDI = collectionTVDI
+
