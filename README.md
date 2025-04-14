@@ -84,6 +84,7 @@ var ROI = ee.Geometry(...)
 var imageCollectionNDVI = ee.ImageCollection(...)
 var imageCollectionLST = ee.ImageCollection(...)
 var SCALE_M_PX = CONST
+var copyDate = true    // When computing, copy "date" property from NDVI
 
 // Import TVDI processing module
 var computeTVDI = require('users/luanabeckerdaluz/TVDIalgorithm:computeTVDI')
@@ -93,6 +94,7 @@ var imageCollectionTVDI = computeTVDI.collectionTVDI(
   imageCollectionNDVI, 
   imageCollectionLST, 
   ROI, 
-  SCALE_M_PX
+  SCALE_M_PX,
+  copyDate
 )
 ```
